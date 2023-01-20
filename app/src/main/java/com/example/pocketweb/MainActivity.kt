@@ -14,7 +14,7 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 import com.example.pocketweb.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var binding: ActivityMainBinding
+    lateinit var binding: ActivityMainBinding
 
     companion object {
         var tabsList: ArrayList<Fragment> = ArrayList()
@@ -31,7 +31,12 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onBackPressed() {
+        var frag:BrowseFragment?= null
+        try {
+            frag = tabsList[binding.viewPager.currentItem] as BrowseFragment
+        }catch (e: Exception){}
         when {
+            frag?.binding?.webView?.canGoBack() == true -> frag.binding.webView.goBack()
             binding.viewPager.currentItem != 0 -> {
                 tabsList.removeAt(binding.viewPager.currentItem)
                 binding.viewPager.adapter?.notifyDataSetChanged()

@@ -21,18 +21,29 @@ class HomeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         val mainActivityRef = requireActivity() as MainActivity
+        mainActivityRef.binding.topSearchBar.setText("")
+        binding.searchView.setQuery("" , false)
+        mainActivityRef.binding.webIcon.setImageResource(R.drawable.ic_search)
         binding.searchView.setOnQueryTextListener(object: androidx.appcompat.widget.SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(result: String?): Boolean {
 //
                 if(mainActivityRef.checkForInternet(requireContext()))
                     mainActivityRef.changeTab(result!! , BrowseFragment(result))
                 else
-                    Snackbar.make(binding.root , "Internet not Connected" , 3000).show()
+                    Snackbar.make(binding.root , "Internet not Connected" , 2000).show()
                 return true
             }
 
             override fun onQueryTextChange(newText: String?): Boolean = false
-
         })
+
+        mainActivityRef.binding.goBtn.setOnClickListener{
+            if(mainActivityRef.checkForInternet(requireContext()))
+                mainActivityRef.changeTab(mainActivityRef.binding.topSearchBar.text.toString() ,
+                    BrowseFragment(mainActivityRef.binding.topSearchBar.text.toString()))
+            else
+                Snackbar.make(binding.root , "Internet not Connected" , 2000).show()
+        }
+
     }
 }

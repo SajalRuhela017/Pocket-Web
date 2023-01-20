@@ -22,22 +22,26 @@
             android:paddingHorizontal="5dp">
 
             <com.google.android.material.imageview.ShapeableImageView
-                android:layout_width="25dp"
+                android:id="@+id/webIcon"
+                android:layout_width="30dp"
                 android:layout_height="match_parent"
                 android:src="@drawable/ic_search">
             </com.google.android.material.imageview.ShapeableImageView>
 
             <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/topSearchBar"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:hint="@string/enterURL"
-                android:layout_marginStart="8dp"
+                android:singleLine="true"
+                android:layout_marginStart="6dp"
                 android:inputType="textWebEmailAddress"
                 android:layout_weight="1"
                 android:background="@drawable/custom_design">
             </com.google.android.material.textfield.TextInputEditText>
 
             <ImageButton
+                android:id="@+id/goBtn"
                 android:layout_width="40dp"
                 android:layout_height="match_parent"
                 android:src="@drawable/ic_arrow_forward"
@@ -48,9 +52,18 @@
         </LinearLayout>
 
         <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/progressBar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scaleY="0.5">
+            android:scaleY="0.5"
+            android:visibility="gone">
+        </com.google.android.material.progressindicator.LinearProgressIndicator>
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scaleY="0.5"
+            android:visibility="gone">
         </com.google.android.material.progressindicator.LinearProgressIndicator>
     </LinearLayout>
 
