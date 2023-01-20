@@ -1,4 +1,4 @@
-package com.example.pocketweb
+package com.example.pocketweb.fragment
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
@@ -9,6 +9,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
 import androidx.fragment.app.Fragment
+import com.example.pocketweb.activity.MainActivity
+import com.example.pocketweb.R
 import com.example.pocketweb.databinding.FragmentBrowseBinding
 
 
@@ -17,7 +19,7 @@ class BrowseFragment(private var urlNew: String) : Fragment() {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_browse , container , false)
+        val view = inflater.inflate(R.layout.fragment_browse, container , false)
         binding = FragmentBrowseBinding.bind(view)
 
         return view
@@ -32,7 +34,15 @@ class BrowseFragment(private var urlNew: String) : Fragment() {
             settings.setSupportZoom(true)
             settings.builtInZoomControls = true
             settings.displayZoomControls = false
+
             webViewClient = object: WebViewClient() {
+
+                override fun onLoadResource(view: WebView?, url: String?) {
+                    super.onLoadResource(view, url)
+                    if(MainActivity.isDesktopSite)
+                        view?.evaluateJavascript("document.querySelector('meta[name=\"viewport\"]').setAttribute('content',"
+                                + " 'width=1024px, initial-scale=' + (document.documentElement.clientWidth / 1024));" , null)
+                }
                 override fun doUpdateVisitedHistory(view: WebView?, url: String?, isReload: Boolean) {
                     super.doUpdateVisitedHistory(view, url, isReload)
                     mainRef.binding.topSearchBar.text = SpannableStringBuilder(url)
@@ -48,6 +58,7 @@ class BrowseFragment(private var urlNew: String) : Fragment() {
                 override fun onPageFinished(view: WebView?, url: String?) {
                     super.onPageFinished(view, url)
                     mainRef.binding.progressBar.visibility = View.GONE
+                    binding.webView.zoomOut()
                 }
             }
 

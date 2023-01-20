@@ -1,10 +1,15 @@
-package com.example.pocketweb
+package com.example.pocketweb.fragment
 
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.GridLayoutManager
+import com.example.pocketweb.model.Bookmark
+import com.example.pocketweb.adapter.BookmarkAdapter
+import com.example.pocketweb.activity.MainActivity
+import com.example.pocketweb.R
 import com.example.pocketweb.databinding.FragmentHomeBinding
 import com.google.android.material.snackbar.Snackbar
 
@@ -13,7 +18,7 @@ class HomeFragment : Fragment() {
     private lateinit var binding: FragmentHomeBinding
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_home , container , false)
+        val view = inflater.inflate(R.layout.fragment_home, container , false)
         binding = FragmentHomeBinding.bind(view)
         return view
     }
@@ -40,10 +45,23 @@ class HomeFragment : Fragment() {
         mainActivityRef.binding.goBtn.setOnClickListener{
             if(mainActivityRef.checkForInternet(requireContext()))
                 mainActivityRef.changeTab(mainActivityRef.binding.topSearchBar.text.toString() ,
-                    BrowseFragment(mainActivityRef.binding.topSearchBar.text.toString()))
+                    BrowseFragment(mainActivityRef.binding.topSearchBar.text.toString())
+                )
             else
                 Snackbar.make(binding.root , "Internet not Connected" , 2000).show()
         }
 
+        MainActivity.bookmarkList.add(Bookmark("Google" , "www.google.com"))
+        MainActivity.bookmarkList.add(Bookmark("Youtube" , "www.youtube.com"))
+        MainActivity.bookmarkList.add(Bookmark("Github" , "www.github.com"))
+        MainActivity.bookmarkList.add(Bookmark("Gmail" , "www.gmail.com"))
+        MainActivity.bookmarkList.add(Bookmark("Leetcode" , "www.leetcode.com"))
+        MainActivity.bookmarkList.add(Bookmark("Codeforces" , "www.codeforces.com"))
+
+
+        binding.recyclerView.setHasFixedSize(true)
+        binding.recyclerView.setItemViewCacheSize(5)
+        binding.recyclerView.layoutManager = GridLayoutManager(requireContext() , 5)
+        binding.recyclerView.adapter = BookmarkAdapter(requireContext())
     }
 }

@@ -1,4 +1,4 @@
-package com.example.pocketweb
+package com.example.pocketweb.activity
 
 import android.annotation.SuppressLint
 import android.content.Context
@@ -23,6 +23,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.example.pocketweb.fragment.BrowseFragment
+import com.example.pocketweb.fragment.HomeFragment
+import com.example.pocketweb.model.Bookmark
+import com.example.pocketweb.R
 import com.example.pocketweb.databinding.ActivityMainBinding
 import com.example.pocketweb.databinding.FeaturesMoreBinding
 import com.google.android.material.button.MaterialButton
@@ -37,6 +41,8 @@ class MainActivity : AppCompatActivity() {
     companion object {
         var tabsList: ArrayList<Fragment> = ArrayList()
         private var isFullScreen: Boolean = true
+        var isDesktopSite: Boolean = false
+        var bookmarkList: ArrayList<Bookmark> = ArrayList()
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,7 +60,7 @@ class MainActivity : AppCompatActivity() {
 
     @SuppressLint("NotifyDataSetChanged")
     override fun onBackPressed() {
-        var frag:BrowseFragment?= null
+        var frag: BrowseFragment?= null
         try {
             frag = tabsList[binding.viewPager.currentItem] as BrowseFragment
         }catch (_: Exception){}
@@ -102,7 +108,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun initializeView() {
         binding.settingsBtn.setOnClickListener {
-            var frag:BrowseFragment?= null
+            var frag: BrowseFragment?= null
             try {
                 frag = tabsList[binding.viewPager.currentItem] as BrowseFragment
             } catch (_: Exception){}
@@ -120,6 +126,13 @@ class MainActivity : AppCompatActivity() {
 
             if(isFullScreen) {
                 dialogBinding.fullscreen.apply {
+                    setIconTintResource(R.color.cool_blue)
+                    setTextColor(ContextCompat.getColor(this@MainActivity , R.color.cool_blue))
+                }
+            }
+
+            if(isDesktopSite) {
+                dialogBinding.desktop.apply {
                     setIconTintResource(R.color.cool_blue)
                     setTextColor(ContextCompat.getColor(this@MainActivity , R.color.cool_blue))
                 }
@@ -157,6 +170,31 @@ class MainActivity : AppCompatActivity() {
                     it.setIconTintResource(R.color.cool_blue)
                     it.setTextColor(ContextCompat.getColor(this , R.color.cool_blue))
                     true
+                }
+            }
+
+            dialogBinding.desktop.setOnClickListener {
+                it as MaterialButton
+                frag?.binding?.webView?.apply {
+                    isDesktopSite = if(isDesktopSite) {
+                        settings.userAgentString = null
+                        it.setIconTintResource(R.color.black)
+                        it.setTextColor(ContextCompat.getColor(this@MainActivity , R.color.black))
+                        false
+                    }
+                    else {
+                        settings.userAgentString = "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/109.0"
+                        settings.useWideViewPort = true
+                        evaluateJavascript("document.querySelector('meta[name=\"viewport\"]').setAttribute('content',"
+                            + " 'width=1024px, initial-scale=' + (document.documentElement.clientWidth / 1024));" , null)
+                        it.setIconTintResource(R.color.cool_blue)
+                        it.setTextColor(ContextCompat.getColor(this@MainActivity ,
+                            R.color.cool_blue
+                        ))
+                        true
+                    }
+                    reload()
+                    dialog.dismiss()
                 }
             }
         }
