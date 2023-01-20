@@ -7,10 +7,7 @@ import android.text.SpannableStringBuilder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.URLUtil
-import android.webkit.WebChromeClient
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.webkit.*
 import androidx.fragment.app.Fragment
 import com.example.pocketweb.databinding.FragmentBrowseBinding
 
@@ -26,7 +23,7 @@ class BrowseFragment(private var urlNew: String) : Fragment() {
         return view
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
+    @SuppressLint("SetJavaScriptEnabled", "ClickableViewAccessibility")
     override fun onResume() {
         super.onResume()
         val mainRef = requireActivity() as MainActivity
@@ -45,6 +42,7 @@ class BrowseFragment(private var urlNew: String) : Fragment() {
                     super.onPageStarted(view, url, favicon)
                     mainRef.binding.progressBar.progress = 0
                     mainRef.binding.progressBar.visibility = View.VISIBLE
+                    if(url!!.contains("you", ignoreCase = false)) mainRef.binding.root.transitionToEnd()
                 }
 
                 override fun onPageFinished(view: WebView?, url: String?) {
@@ -58,7 +56,7 @@ class BrowseFragment(private var urlNew: String) : Fragment() {
                     super.onReceivedIcon(view, icon)
                     try{
                         mainRef.binding.webIcon.setImageBitmap(icon)
-                    } catch (e: Exception) {}
+                    } catch (_: Exception) {}
                 }
 
                 override fun onShowCustomView(view: View?, callback: CustomViewCallback?) {
@@ -66,6 +64,7 @@ class BrowseFragment(private var urlNew: String) : Fragment() {
                     binding.webView.visibility = View.GONE
                     binding.customView.visibility = View.VISIBLE
                     binding.customView.addView(view)
+                    mainRef.binding.root.transitionToEnd()
                 }
 
                 override fun onHideCustomView() {
@@ -84,6 +83,26 @@ class BrowseFragment(private var urlNew: String) : Fragment() {
                 urlNew.contains(".com" , ignoreCase = true) -> loadUrl(urlNew)
                 else -> loadUrl("https://duckduckgo.com/?q=$urlNew")
             }
+
+            binding.webView.setOnTouchListener {_ ,motionEvent ->
+                mainRef.binding.root.onTouchEvent(motionEvent)
+                return@setOnTouchListener false
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        //Clearing all web-view data
+        binding.webView.apply {
+            clearMatches()
+            clearHistory()
+            clearFormData()
+            clearSslPreferences()
+            clearCache(true)
+
+            CookieManager.getInstance().removeAllCookies(null)
+            WebStorage.getInstance().deleteAllData()
         }
     }
 }

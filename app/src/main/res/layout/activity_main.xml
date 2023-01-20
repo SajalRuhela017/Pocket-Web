@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.motion.widget.MotionLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    app:layoutDescription="@xml/activity_main_scene"
     tools:context=".MainActivity">
 
     <LinearLayout
@@ -13,8 +14,7 @@
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" >
-
+        app:layout_constraintTop_toTopOf="parent">
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="50dp"
@@ -32,22 +32,21 @@
                 android:id="@+id/topSearchBar"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:hint="@string/enterURL"
-                android:singleLine="true"
                 android:layout_marginStart="6dp"
-                android:inputType="textWebEmailAddress"
                 android:layout_weight="1"
-                android:background="@drawable/custom_design">
-            </com.google.android.material.textfield.TextInputEditText>
+                android:background="@drawable/custom_design"
+                android:hint="@string/enterURL"
+                android:inputType="textWebEmailAddress"
+                android:singleLine="true"
+                android:textColorHint="#757575"></com.google.android.material.textfield.TextInputEditText>
 
             <ImageButton
                 android:id="@+id/goBtn"
-                android:layout_width="40dp"
+                android:layout_width="48dp"
                 android:layout_height="match_parent"
-                android:src="@drawable/ic_arrow_forward"
                 android:background="?attr/selectableItemBackground"
-                android:contentDescription="@string/go_btn">
-            </ImageButton>
+                android:contentDescription="@string/go_btn"
+                android:src="@drawable/ic_arrow_forward"></ImageButton>
 
         </LinearLayout>
 
@@ -78,17 +77,18 @@
     </androidx.viewpager2.widget.ViewPager2>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/settingsBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/ic_settings"
-        android:contentDescription="@string/settings_btn"
         android:backgroundTint="@color/white"
+        android:contentDescription="@string/settings_btn"
+        android:src="@drawable/ic_settings"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.95"
-        app:layout_constraintVertical_bias="0.98"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.98">
     </com.google.android.material.floatingactionbutton.FloatingActionButton>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.constraintlayout.motion.widget.MotionLayout>
