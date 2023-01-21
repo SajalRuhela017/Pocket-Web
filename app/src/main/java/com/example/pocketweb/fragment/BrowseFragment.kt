@@ -9,9 +9,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.*
 import androidx.fragment.app.Fragment
-import com.example.pocketweb.activity.MainActivity
 import com.example.pocketweb.R
+import com.example.pocketweb.activity.MainActivity
 import com.example.pocketweb.databinding.FragmentBrowseBinding
+import java.io.ByteArrayOutputStream
 
 
 class BrowseFragment(private var urlNew: String) : Fragment() {
@@ -67,6 +68,12 @@ class BrowseFragment(private var urlNew: String) : Fragment() {
                     super.onReceivedIcon(view, icon)
                     try{
                         mainRef.binding.webIcon.setImageBitmap(icon)
+                        MainActivity.bookmarkIndex = mainRef.isBookmarked(view?.url!!)
+                        if(MainActivity.bookmarkIndex != -1) {
+                            val array = ByteArrayOutputStream()
+                            icon!!.compress(Bitmap.CompressFormat.PNG, 100, array)
+                            MainActivity.bookmarkList[MainActivity.bookmarkIndex].image = array.toByteArray()
+                        }
                     } catch (_: Exception) {}
                 }
 

@@ -23,12 +23,13 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import com.example.pocketweb.R
+import com.example.pocketweb.databinding.ActivityMainBinding
+import com.example.pocketweb.databinding.BookmarkDialogBinding
+import com.example.pocketweb.databinding.FeaturesMoreBinding
 import com.example.pocketweb.fragment.BrowseFragment
 import com.example.pocketweb.fragment.HomeFragment
 import com.example.pocketweb.model.Bookmark
-import com.example.pocketweb.R
-import com.example.pocketweb.databinding.ActivityMainBinding
-import com.example.pocketweb.databinding.FeaturesMoreBinding
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import java.net.URL
@@ -43,6 +44,7 @@ class MainActivity : AppCompatActivity() {
         private var isFullScreen: Boolean = true
         var isDesktopSite: Boolean = false
         var bookmarkList: ArrayList<Bookmark> = ArrayList()
+        var bookmarkIndex: Int = -1
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -125,31 +127,40 @@ class MainActivity : AppCompatActivity() {
             dialog.show()
 
             if(isFullScreen) {
-                dialogBinding.fullscreen.apply {
+                dialogBinding.fullscreenBtn.apply {
                     setIconTintResource(R.color.cool_blue)
                     setTextColor(ContextCompat.getColor(this@MainActivity , R.color.cool_blue))
                 }
             }
+
+            frag?.let {
+                bookmarkIndex = isBookmarked(it.binding.webView.url!!)
+                if(bookmarkIndex != -1) {
+                dialogBinding.bookmarkBtn.apply {
+                    setIconTintResource(R.color.cool_blue)
+                    setTextColor(ContextCompat.getColor(this@MainActivity , R.color.cool_blue))
+                }
+            } }
 
             if(isDesktopSite) {
-                dialogBinding.desktop.apply {
+                dialogBinding.desktopBtn.apply {
                     setIconTintResource(R.color.cool_blue)
                     setTextColor(ContextCompat.getColor(this@MainActivity , R.color.cool_blue))
                 }
             }
 
-            dialogBinding.back.setOnClickListener {
+            dialogBinding.backBtn.setOnClickListener {
                 onBackPressed()
             }
 
-            dialogBinding.forward.setOnClickListener {
+            dialogBinding.forwardBtn.setOnClickListener {
                 frag?.apply {
                     if(binding.webView.canGoForward())
                         binding.webView.goForward()
                 }
             }
 
-            dialogBinding.save.setOnClickListener {
+            dialogBinding.saveBtn.setOnClickListener {
                 dialog.dismiss()
                 if(frag != null)
                     saveAsPdf(web = frag.binding.webView)
@@ -157,7 +168,7 @@ class MainActivity : AppCompatActivity() {
                     Toast.makeText(this , "No webpage found" , Toast.LENGTH_SHORT).show()
             }
 
-            dialogBinding.fullscreen.setOnClickListener {
+            dialogBinding.fullscreenBtn.setOnClickListener {
                 it as MaterialButton
                 isFullScreen = if(isFullScreen) {
                     changeFullScreen(false)
@@ -173,7 +184,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
-            dialogBinding.desktop.setOnClickListener {
+            dialogBinding.desktopBtn.setOnClickListener {
                 it as MaterialButton
                 frag?.binding?.webView?.apply {
                     isDesktopSite = if(isDesktopSite) {
@@ -196,6 +207,38 @@ class MainActivity : AppCompatActivity() {
                     reload()
                     dialog.dismiss()
                 }
+            }
+
+            dialogBinding.bookmarkBtn.setOnClickListener {
+                frag?.let {
+                    if(bookmarkIndex == -1) {
+                        val viewBookmark = layoutInflater.inflate(R.layout.bookmark_dialog, binding.root, false)
+                        val bookmarkBinding = BookmarkDialogBinding.bind(viewBookmark)
+                        val dialogBookmark = MaterialAlertDialogBuilder(this)
+                            .setTitle("Add Bookmark")
+                            .setMessage("URL: ${it.binding.webView.url}")
+                            .setPositiveButton("Add"){self, _ ->
+                                bookmarkList.add(Bookmark(bookmarkBinding.bookmarkTitle.text.toString() , it.binding.webView.url!!))
+                                self.dismiss()}
+                            .setNegativeButton("Cancel"){self , _ -> self.dismiss()}
+                            .setView(viewBookmark).create()
+                        dialogBookmark.show()
+                        bookmarkBinding.bookmarkTitle.setText(it.binding.webView.url)
+                    } else {
+                        val viewBookmark = layoutInflater.inflate(R.layout.bookmark_dialog, binding.root, false)
+                        val bookmarkBinding = BookmarkDialogBinding.bind(viewBookmark)
+                        val dialogBookmark = MaterialAlertDialogBuilder(this)
+                            .setTitle("Remove Bookmark")
+                            .setMessage("URL: ${it.binding.webView.url}")
+                            .setPositiveButton("Remove"){self, _ ->
+                                bookmarkList.removeAt(bookmarkIndex)
+                                self.dismiss()}
+                            .setNegativeButton("Cancel"){self , _ -> self.dismiss()}
+                            .create()
+                        dialogBookmark.show()
+                    }
+                }
+                dialog.dismiss()
             }
         }
     }
@@ -234,4 +277,11 @@ class MainActivity : AppCompatActivity() {
                 WindowInsetsControllerCompat(window, binding.root).show(WindowInsetsCompat.Type.systemBars())
             }
         }
+
+    fun isBookmarked(url: String): Int {
+        bookmarkList.forEachIndexed { index, bookmark ->
+            if (bookmark.url == url)    return index
+        }
+        return -1
     }
+}

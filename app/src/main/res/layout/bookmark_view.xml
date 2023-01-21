@@ -10,11 +10,9 @@
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:gravity="center"
-        android:text="Google"
         android:textSize="22sp"
         android:textStyle="bold"
-        android:textColor="@color/white">
-    </TextView>
+        android:textColor="@color/white" />
 
     <TextView
         android:id="@+id/bookmarkName"
@@ -24,7 +22,6 @@
         android:singleLine="true"
         android:gravity="center"
         android:textSize="12sp"
-        android:textColor="@color/black">
-    </TextView>
+        android:textColor="@color/black"/>
 
 </LinearLayout>

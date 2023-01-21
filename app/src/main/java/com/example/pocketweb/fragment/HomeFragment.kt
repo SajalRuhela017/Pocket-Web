@@ -4,12 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.pocketweb.model.Bookmark
-import com.example.pocketweb.adapter.BookmarkAdapter
-import com.example.pocketweb.activity.MainActivity
 import com.example.pocketweb.R
+import com.example.pocketweb.activity.MainActivity
+import com.example.pocketweb.adapter.BookmarkAdapter
 import com.example.pocketweb.databinding.FragmentHomeBinding
 import com.google.android.material.snackbar.Snackbar
 
@@ -22,6 +22,7 @@ class HomeFragment : Fragment() {
         binding = FragmentHomeBinding.bind(view)
         return view
     }
+
 
     override fun onResume() {
         super.onResume()
@@ -48,16 +49,8 @@ class HomeFragment : Fragment() {
                     BrowseFragment(mainActivityRef.binding.topSearchBar.text.toString())
                 )
             else
-                Snackbar.make(binding.root , "Internet not Connected" , 2000).show()
+                Toast.makeText(context , "Internet not connected" , Toast.LENGTH_SHORT).show()
         }
-
-        MainActivity.bookmarkList.add(Bookmark("Google" , "www.google.com"))
-        MainActivity.bookmarkList.add(Bookmark("Youtube" , "www.youtube.com"))
-        MainActivity.bookmarkList.add(Bookmark("Github" , "www.github.com"))
-        MainActivity.bookmarkList.add(Bookmark("Gmail" , "www.gmail.com"))
-        MainActivity.bookmarkList.add(Bookmark("Leetcode" , "www.leetcode.com"))
-        MainActivity.bookmarkList.add(Bookmark("Codeforces" , "www.codeforces.com"))
-
 
         binding.recyclerView.setHasFixedSize(true)
         binding.recyclerView.setItemViewCacheSize(5)

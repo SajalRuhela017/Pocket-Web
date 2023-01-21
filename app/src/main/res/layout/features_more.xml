@@ -11,7 +11,7 @@
         android:orientation="horizontal">
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/back"
+            android:id="@+id/backBtn"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -25,7 +25,7 @@
         </com.google.android.material.button.MaterialButton>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/forward"
+            android:id="@+id/forwardBtn"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -39,7 +39,7 @@
         </com.google.android.material.button.MaterialButton>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/bookmark"
+            android:id="@+id/bookmarkBtn"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -60,7 +60,7 @@
         android:orientation="horizontal">
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/fullscreen"
+            android:id="@+id/fullscreenBtn"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -74,7 +74,7 @@
         </com.google.android.material.button.MaterialButton>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/desktop"
+            android:id="@+id/desktopBtn"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
@@ -88,7 +88,7 @@
         </com.google.android.material.button.MaterialButton>
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/save"
+            android:id="@+id/saveBtn"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
