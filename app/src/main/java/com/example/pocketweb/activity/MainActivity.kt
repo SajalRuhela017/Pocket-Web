@@ -2,6 +2,7 @@ package com.example.pocketweb.activity
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.drawable.ColorDrawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -23,7 +24,9 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
 import androidx.viewpager2.adapter.FragmentStateAdapter
+import androidx.viewpager2.widget.ViewPager2
 import com.example.pocketweb.R
+import com.example.pocketweb.activity.MainActivity.Companion.myPager
 import com.example.pocketweb.databinding.ActivityMainBinding
 import com.example.pocketweb.databinding.BookmarkDialogBinding
 import com.example.pocketweb.databinding.FeaturesMoreBinding
@@ -32,6 +35,9 @@ import com.example.pocketweb.fragment.HomeFragment
 import com.example.pocketweb.model.Bookmark
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.gson.GsonBuilder
+import com.google.gson.reflect.TypeToken
+import java.io.ByteArrayOutputStream
 import java.net.URL
 import java.text.SimpleDateFormat
 import java.util.*
@@ -45,6 +51,7 @@ class MainActivity : AppCompatActivity() {
         var isDesktopSite: Boolean = false
         var bookmarkList: ArrayList<Bookmark> = ArrayList()
         var bookmarkIndex: Int = -1
+        lateinit var myPager: ViewPager2
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,9 +60,11 @@ class MainActivity : AppCompatActivity() {
         }
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        getAllBookmarks()
         tabsList.add(HomeFragment())
         binding.viewPager.adapter = TabsAdapter(supportFragmentManager , lifecycle)
         binding.viewPager.isUserInputEnabled = false
+        myPager = binding.viewPager
         initializeView()
         changeFullScreen(false)
     }
@@ -81,31 +90,6 @@ class MainActivity : AppCompatActivity() {
         override fun getItemCount(): Int = tabsList.size
 
         override fun createFragment(position: Int): Fragment = tabsList[position]
-    }
-
-    @SuppressLint("NotifyDataSetChanged")
-    fun changeTab(url: String, fragment: Fragment) {
-        tabsList.add(fragment)
-        binding.viewPager.adapter?.notifyDataSetChanged()
-        binding.viewPager.currentItem = tabsList.size - 1
-    }
-
-    fun checkForInternet(context: Context): Boolean {
-        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-
-        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val network = connectivityManager.activeNetwork ?: return false
-            val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
-
-            return when {
-                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
-                activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
-                else -> false
-            }
-        } else {
-            val networkInfo = connectivityManager.activeNetworkInfo ?: return false
-            return networkInfo.isConnected
-        }
     }
 
     private fun initializeView() {
@@ -218,12 +202,20 @@ class MainActivity : AppCompatActivity() {
                             .setTitle("Add Bookmark")
                             .setMessage("URL: ${it.binding.webView.url}")
                             .setPositiveButton("Add"){self, _ ->
-                                bookmarkList.add(Bookmark(bookmarkBinding.bookmarkTitle.text.toString() , it.binding.webView.url!!))
+                                try {
+                                    val array = ByteArrayOutputStream()
+                                    it.favicon?.compress(Bitmap.CompressFormat.PNG, 100, array)
+                                    bookmarkList.add(Bookmark(bookmarkBinding.bookmarkTitle.text.toString() , it.binding.webView.url!! , array.toByteArray()))
+                                } catch (e: Exception) {
+                                    val array = ByteArrayOutputStream()
+                                    it.favicon?.compress(Bitmap.CompressFormat.PNG, 100, array)
+                                    bookmarkList.add(Bookmark(bookmarkBinding.bookmarkTitle.text.toString() , it.binding.webView.url!!))
+                                }
                                 self.dismiss()}
                             .setNegativeButton("Cancel"){self , _ -> self.dismiss()}
                             .setView(viewBookmark).create()
                         dialogBookmark.show()
-                        bookmarkBinding.bookmarkTitle.setText(it.binding.webView.url)
+                        bookmarkBinding.bookmarkTitle.setText(it.binding.webView.title)
                     } else {
                         val viewBookmark = layoutInflater.inflate(R.layout.bookmark_dialog, binding.root, false)
                         val bookmarkBinding = BookmarkDialogBinding.bind(viewBookmark)
@@ -283,5 +275,50 @@ class MainActivity : AppCompatActivity() {
             if (bookmark.url == url)    return index
         }
         return -1
+    }
+
+    fun savedBookmarks() {
+        //storing bookmarks in shared preferences
+        val editor = getSharedPreferences("BOOKMARKS" , MODE_PRIVATE).edit()
+        val data = GsonBuilder().create().toJson(bookmarkList)
+        editor.putString("bookmarkList" , data)
+        editor.apply()
+    }
+
+    private fun getAllBookmarks() {
+        //getting Bookmarks from shared preferences
+        bookmarkList = ArrayList()
+        val editor = getSharedPreferences("BOOKMARKS" , MODE_PRIVATE)
+        val data = editor.getString("bookmarkList" , null)
+        if(data != null) {
+            val list: ArrayList<Bookmark> = GsonBuilder().create().fromJson(data , object:
+                TypeToken<ArrayList<Bookmark>>(){}.type)
+            bookmarkList.addAll(list)
+        }
+    }
+}
+
+@SuppressLint("NotifyDataSetChanged")
+fun changeTab(url: String, fragment: Fragment) {
+    MainActivity.tabsList.add(fragment)
+    myPager.adapter?.notifyDataSetChanged()
+    myPager.currentItem = MainActivity.tabsList.size - 1
+}
+
+fun checkForInternet(context: Context): Boolean {
+    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        val network = connectivityManager.activeNetwork ?: return false
+        val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+
+        return when {
+            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> true
+            activeNetwork.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> true
+            else -> false
+        }
+    } else {
+        val networkInfo = connectivityManager.activeNetworkInfo ?: return false
+        return networkInfo.isConnected
     }
 }

@@ -1,5 +1,6 @@
 package com.example.pocketweb.fragment
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,7 +9,10 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.pocketweb.R
+import com.example.pocketweb.activity.BookmarkActivity
 import com.example.pocketweb.activity.MainActivity
+import com.example.pocketweb.activity.changeTab
+import com.example.pocketweb.activity.checkForInternet
 import com.example.pocketweb.adapter.BookmarkAdapter
 import com.example.pocketweb.databinding.FragmentHomeBinding
 import com.google.android.material.snackbar.Snackbar
@@ -33,8 +37,8 @@ class HomeFragment : Fragment() {
         binding.searchView.setOnQueryTextListener(object: androidx.appcompat.widget.SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(result: String?): Boolean {
 //
-                if(mainActivityRef.checkForInternet(requireContext()))
-                    mainActivityRef.changeTab(result!! , BrowseFragment(result))
+                if(checkForInternet(requireContext()))
+                    changeTab(result!! , BrowseFragment(result))
                 else
                     Snackbar.make(binding.root , "Internet not Connected" , 2000).show()
                 return true
@@ -44,8 +48,8 @@ class HomeFragment : Fragment() {
         })
 
         mainActivityRef.binding.goBtn.setOnClickListener{
-            if(mainActivityRef.checkForInternet(requireContext()))
-                mainActivityRef.changeTab(mainActivityRef.binding.topSearchBar.text.toString() ,
+            if(checkForInternet(requireContext()))
+                changeTab(mainActivityRef.binding.topSearchBar.text.toString() ,
                     BrowseFragment(mainActivityRef.binding.topSearchBar.text.toString())
                 )
             else
@@ -56,5 +60,12 @@ class HomeFragment : Fragment() {
         binding.recyclerView.setItemViewCacheSize(5)
         binding.recyclerView.layoutManager = GridLayoutManager(requireContext() , 5)
         binding.recyclerView.adapter = BookmarkAdapter(requireContext())
+
+        if(MainActivity.bookmarkList.size < 1) {
+            binding.viewAllBtn.visibility = View.GONE
+        }
+        binding.viewAllBtn.setOnClickListener {
+            startActivity(Intent(requireContext() , BookmarkActivity::class.java))
+        }
     }
 }

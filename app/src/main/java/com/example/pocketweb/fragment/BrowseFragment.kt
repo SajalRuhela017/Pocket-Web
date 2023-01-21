@@ -17,6 +17,7 @@ import java.io.ByteArrayOutputStream
 
 class BrowseFragment(private var urlNew: String) : Fragment() {
     lateinit var binding: FragmentBrowseBinding
+    var favicon: Bitmap? = null
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -68,6 +69,7 @@ class BrowseFragment(private var urlNew: String) : Fragment() {
                     super.onReceivedIcon(view, icon)
                     try{
                         mainRef.binding.webIcon.setImageBitmap(icon)
+                        this@BrowseFragment.favicon = icon
                         MainActivity.bookmarkIndex = mainRef.isBookmarked(view?.url!!)
                         if(MainActivity.bookmarkIndex != -1) {
                             val array = ByteArrayOutputStream()
@@ -111,6 +113,7 @@ class BrowseFragment(private var urlNew: String) : Fragment() {
 
     override fun onPause() {
         super.onPause()
+        (requireActivity() as MainActivity).savedBookmarks()
         //Clearing all web-view data
         binding.webView.apply {
             clearMatches()
