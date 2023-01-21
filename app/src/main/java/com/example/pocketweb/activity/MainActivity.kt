@@ -3,6 +3,7 @@ package com.example.pocketweb.activity
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
@@ -15,8 +16,10 @@ import android.view.Gravity
 import android.view.WindowManager
 import android.webkit.WebView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -30,6 +33,7 @@ import com.example.pocketweb.activity.MainActivity.Companion.myPager
 import com.example.pocketweb.databinding.ActivityMainBinding
 import com.example.pocketweb.databinding.BookmarkDialogBinding
 import com.example.pocketweb.databinding.FeaturesMoreBinding
+import com.example.pocketweb.databinding.TabsViewBinding
 import com.example.pocketweb.fragment.BrowseFragment
 import com.example.pocketweb.fragment.HomeFragment
 import com.example.pocketweb.model.Bookmark
@@ -93,6 +97,30 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initializeView() {
+
+        binding.tabsBtn.setOnClickListener {
+            val viewTabs = layoutInflater.inflate(R.layout.tabs_view, binding.root, false)
+            val BindingTabs = TabsViewBinding.bind(viewTabs)
+
+            val dialogTabs = MaterialAlertDialogBuilder(this, R.style.roundCornerDialog).setView(viewTabs)
+                .setTitle("Select Tab")
+                .setPositiveButton("Home"){self , _ ->
+                    self.dismiss()}
+                .setNeutralButton("Duck Duck Go"){self, _ ->
+                    self.dismiss()
+                }
+                .create()
+            dialogTabs.show()
+            val pBtn = dialogTabs.getButton(AlertDialog.BUTTON_POSITIVE)
+            val nBtn = dialogTabs.getButton(AlertDialog.BUTTON_NEUTRAL)
+            pBtn.setTextColor(Color.BLACK)
+            nBtn.setTextColor(Color.BLACK)
+            pBtn.isAllCaps = false
+            nBtn.isAllCaps = false
+            pBtn.setCompoundDrawablesRelativeWithIntrinsicBounds(ResourcesCompat.getDrawable(resources, R.drawable.ic_home, theme), null, null, null)
+            nBtn.setCompoundDrawablesRelativeWithIntrinsicBounds(ResourcesCompat.getDrawable(resources, R.drawable.ic_add, theme), null, null, null)
+        }
+
         binding.settingsBtn.setOnClickListener {
             var frag: BrowseFragment?= null
             try {
