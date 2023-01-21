@@ -38,7 +38,25 @@
                 android:hint="@string/enterURL"
                 android:inputType="textWebEmailAddress"
                 android:singleLine="true"
-                android:textColorHint="#757575"></com.google.android.material.textfield.TextInputEditText>
+                android:textColorHint="#757575" />
+
+            <com.google.android.material.textview.MaterialTextView
+                android:id="@+id/tabsBtn"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:background="@drawable/custom_tabs_textview"
+                android:text="@string/one"
+                android:gravity="center"
+                android:layout_marginVertical="3dp"
+                android:textColor="@color/black"/>
+
+            <ImageButton
+                android:id="@+id/refreshBtn"
+                android:layout_width="48dp"
+                android:layout_height="match_parent"
+                android:background="?attr/selectableItemBackground"
+                android:contentDescription="@string/refresh_btn"
+                android:src="@drawable/ic_refresh"/>
 
             <ImageButton
                 android:id="@+id/goBtn"
@@ -46,7 +64,7 @@
                 android:layout_height="match_parent"
                 android:background="?attr/selectableItemBackground"
                 android:contentDescription="@string/go_btn"
-                android:src="@drawable/ic_arrow_forward"></ImageButton>
+                android:src="@drawable/ic_arrow_forward"/>
 
         </LinearLayout>
 

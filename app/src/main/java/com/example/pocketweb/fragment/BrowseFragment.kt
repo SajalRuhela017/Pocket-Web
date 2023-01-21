@@ -31,6 +31,10 @@ class BrowseFragment(private var urlNew: String) : Fragment() {
     override fun onResume() {
         super.onResume()
         val mainRef = requireActivity() as MainActivity
+        mainRef.binding.refreshBtn.visibility = View.VISIBLE
+        mainRef.binding.refreshBtn.setOnClickListener {
+            binding.webView.reload()
+        }
         binding.webView.apply {
             settings.javaScriptEnabled = true
             settings.setSupportZoom(true)

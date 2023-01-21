@@ -34,9 +34,9 @@ class HomeFragment : Fragment() {
         mainActivityRef.binding.topSearchBar.setText("")
         binding.searchView.setQuery("" , false)
         mainActivityRef.binding.webIcon.setImageResource(R.drawable.ic_search)
+        mainActivityRef.binding.refreshBtn.visibility = View.GONE
         binding.searchView.setOnQueryTextListener(object: androidx.appcompat.widget.SearchView.OnQueryTextListener{
             override fun onQueryTextSubmit(result: String?): Boolean {
-//
                 if(checkForInternet(requireContext()))
                     changeTab(result!! , BrowseFragment(result))
                 else
