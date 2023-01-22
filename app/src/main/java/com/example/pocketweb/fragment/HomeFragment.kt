@@ -31,6 +31,8 @@ class HomeFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         val mainActivityRef = requireActivity() as MainActivity
+        MainActivity.tabsBtn.text = MainActivity.tabsList.size.toString()
+        MainActivity.tabsList[MainActivity.myPager.currentItem].name = "Home"
         mainActivityRef.binding.topSearchBar.setText("")
         binding.searchView.setQuery("" , false)
         mainActivityRef.binding.webIcon.setImageResource(R.drawable.ic_search)

@@ -26,10 +26,13 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Lifecycle
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.viewpager2.adapter.FragmentStateAdapter
 import androidx.viewpager2.widget.ViewPager2
 import com.example.pocketweb.R
 import com.example.pocketweb.activity.MainActivity.Companion.myPager
+import com.example.pocketweb.activity.MainActivity.Companion.tabsBtn
+import com.example.pocketweb.adapter.TabAdapter
 import com.example.pocketweb.databinding.ActivityMainBinding
 import com.example.pocketweb.databinding.BookmarkDialogBinding
 import com.example.pocketweb.databinding.FeaturesMoreBinding
@@ -37,8 +40,10 @@ import com.example.pocketweb.databinding.TabsViewBinding
 import com.example.pocketweb.fragment.BrowseFragment
 import com.example.pocketweb.fragment.HomeFragment
 import com.example.pocketweb.model.Bookmark
+import com.example.pocketweb.model.Tab
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.textview.MaterialTextView
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import java.io.ByteArrayOutputStream
@@ -50,12 +55,13 @@ class MainActivity : AppCompatActivity() {
     lateinit var binding: ActivityMainBinding
     private var printJob: PrintJob? = null
     companion object {
-        var tabsList: ArrayList<Fragment> = ArrayList()
+        var tabsList: ArrayList<Tab> = ArrayList()
         private var isFullScreen: Boolean = true
         var isDesktopSite: Boolean = false
         var bookmarkList: ArrayList<Bookmark> = ArrayList()
         var bookmarkIndex: Int = -1
         lateinit var myPager: ViewPager2
+        lateinit var tabsBtn: MaterialTextView
     }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,10 +71,11 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         getAllBookmarks()
-        tabsList.add(HomeFragment())
+        tabsList.add(Tab("Home" , HomeFragment()))
         binding.viewPager.adapter = TabsAdapter(supportFragmentManager , lifecycle)
         binding.viewPager.isUserInputEnabled = false
         myPager = binding.viewPager
+        tabsBtn = binding.tabsBtn
         initializeView()
         changeFullScreen(false)
     }
@@ -77,7 +84,7 @@ class MainActivity : AppCompatActivity() {
     override fun onBackPressed() {
         var frag: BrowseFragment?= null
         try {
-            frag = tabsList[binding.viewPager.currentItem] as BrowseFragment
+            frag = tabsList[binding.viewPager.currentItem].fragment as BrowseFragment
         }catch (_: Exception){}
         when {
             frag?.binding?.webView?.canGoBack() == true -> frag.binding.webView.goBack()
@@ -93,23 +100,29 @@ class MainActivity : AppCompatActivity() {
     private inner class TabsAdapter(fa: FragmentManager , lc: Lifecycle) : FragmentStateAdapter(fa , lc) {
         override fun getItemCount(): Int = tabsList.size
 
-        override fun createFragment(position: Int): Fragment = tabsList[position]
+        override fun createFragment(position: Int): Fragment = tabsList[position].fragment
     }
 
     private fun initializeView() {
 
         binding.tabsBtn.setOnClickListener {
             val viewTabs = layoutInflater.inflate(R.layout.tabs_view, binding.root, false)
-            val BindingTabs = TabsViewBinding.bind(viewTabs)
+            val bindingTabs = TabsViewBinding.bind(viewTabs)
 
             val dialogTabs = MaterialAlertDialogBuilder(this, R.style.roundCornerDialog).setView(viewTabs)
                 .setTitle("Select Tab")
                 .setPositiveButton("Home"){self , _ ->
+                    changeTab("Home" , HomeFragment())
                     self.dismiss()}
                 .setNeutralButton("Duck Duck Go"){self, _ ->
+                    changeTab("Duck Duck Go" , BrowseFragment("https://www.duckduckgo.com"))
                     self.dismiss()
                 }
                 .create()
+
+            bindingTabs.tabsRecyclerView.setHasFixedSize(true)
+            bindingTabs.tabsRecyclerView.layoutManager = LinearLayoutManager(this)
+            bindingTabs.tabsRecyclerView.adapter = TabAdapter(this , dialogTabs)
             dialogTabs.show()
             val pBtn = dialogTabs.getButton(AlertDialog.BUTTON_POSITIVE)
             val nBtn = dialogTabs.getButton(AlertDialog.BUTTON_NEUTRAL)
@@ -124,7 +137,7 @@ class MainActivity : AppCompatActivity() {
         binding.settingsBtn.setOnClickListener {
             var frag: BrowseFragment?= null
             try {
-                frag = tabsList[binding.viewPager.currentItem] as BrowseFragment
+                frag = tabsList[binding.viewPager.currentItem].fragment as BrowseFragment
             } catch (_: Exception){}
             val view = layoutInflater.inflate(R.layout.features_more, binding.root, false)
             val dialogBinding = FeaturesMoreBinding.bind(view)
@@ -327,10 +340,12 @@ class MainActivity : AppCompatActivity() {
 }
 
 @SuppressLint("NotifyDataSetChanged")
-fun changeTab(url: String, fragment: Fragment) {
-    MainActivity.tabsList.add(fragment)
+fun changeTab(url: String, fragment: Fragment, isBackground: Boolean = false) {
+    MainActivity.tabsList.add(Tab(url , fragment))
     myPager.adapter?.notifyDataSetChanged()
-    myPager.currentItem = MainActivity.tabsList.size - 1
+    tabsBtn.text = MainActivity.tabsList.size.toString()
+    if(!isBackground)
+        myPager.currentItem = MainActivity.tabsList.size - 1
 }
 
 fun checkForInternet(context: Context): Boolean {
